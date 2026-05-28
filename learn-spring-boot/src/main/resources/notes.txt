@@ -1,0 +1,7 @@
+trace
+debug
+info
+warning
+error
+
+C:\Users\Nihaal\OneDrive\Desktop\Spring\learn-spring-boot\target\learn-spring-boot-0.0.1-SNAPSHOT.jar
