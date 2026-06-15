@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   deleteTodoApi,
   retrieveAllTodosForUsernameApi,
 } from "./api/TodoApiService";
 import { useAuth } from "./security/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function ListTodosComponent() {
   // const today = new Date();
@@ -37,10 +37,8 @@ export default function ListTodosComponent() {
   }, []);
 
   function refreshTodos() {
-    console.log("Username:", username);
     retrieveAllTodosForUsernameApi(username)
       .then((response) => {
-        // console.log(response)
         setTodos(response.data);
       })
       .catch((error) => console.log(error));
@@ -58,21 +56,32 @@ export default function ListTodosComponent() {
 
   function updateTodo(id) {
     console.log("clicked", id);
-    navigate(`/todo/${id}`)
+    navigate(`/todo/${id}`);
+  }
+
+  function addNewTodo() {
+    navigate(`/todo/-1`);
   }
 
   return (
     <div className="container">
-      <h2>Things You Want To Do!</h2>
+      <h1>
+        <b>Things You Want To Do!</b>
+      </h1>
       {message && <div className="alert alert-warning">{message}</div>}
       <div>
-        <table className="table">
+        <table className="table m-5">
           <thead>
             <tr>
-              <td>Description</td>
-              <td>Is Done?</td>
-              <td>Target Date</td>
-              <td></td>
+              <td>
+                <b> Description</b>
+              </td>
+              <td>
+                <b>Is Done?</b>
+              </td>
+              <td>
+                <b>Target Date</b>
+              </td>
             </tr>
           </thead>
           <tbody>
@@ -104,6 +113,11 @@ export default function ListTodosComponent() {
             ))}
           </tbody>
         </table>
+        <div>
+          <button className="btn btn-success m-5 " onClick={addNewTodo}>
+            Add new Task
+          </button>
+        </div>
       </div>
     </div>
   );

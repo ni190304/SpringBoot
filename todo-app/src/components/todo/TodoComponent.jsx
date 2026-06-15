@@ -1,12 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate, useParams } from "react-router-dom";
-import { retrieveTodoApi, updateTodoApi } from "./api/TodoApiService";
+import {
+  createTodoApi,
+  retrieveTodoApi,
+  updateTodoApi,
+} from "./api/TodoApiService";
 import { useAuth } from "./security/AuthContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useEffect, useState } from "react";
+import moment from "moment";
 
 export default function TodoComponent() {
   const { id } = useParams();
+  const todoId = Number(id);
 
   const [description, setDescription] = useState("");
   const [targetDate, setTargetDate] = useState("");
@@ -16,10 +22,14 @@ export default function TodoComponent() {
 
   const navigate = useNavigate();
 
-  useEffect(() => retrieveTodos(), [id]);
+  useEffect(() => {
+    if (todoId !== -1) {
+      retrieveTodos();
+    }
+  }, [todoId]);
 
   function retrieveTodos() {
-    retrieveTodoApi(username, id)
+    retrieveTodoApi(username, todoId)
       .then((response) => {
         setDescription(response.data.description);
         setTargetDate(response.data.targetDate);
@@ -28,43 +38,46 @@ export default function TodoComponent() {
   }
 
   function onSubmit(values) {
-    console.log(values);
     const todo = {
-      id: id,
-      username: username,
+      id: todoId,
+      username,
       description: values.description,
       targetDate: values.targetDate,
       done: false,
     };
 
-    console.log(todo);
-
-    updateTodoApi(username, id, todo)
-      .then((response) => {
-        navigate("/todos");
-      })
-      .catch((error) => console.log(error));
+    if (todoId === -1) {
+      createTodoApi(username, todo)
+        .then(() => navigate("/todos"))
+        .catch((error) => console.log(error));
+    } else {
+      updateTodoApi(username, todoId, todo)
+        .then(() => navigate("/todos"))
+        .catch((error) => console.log(error));
+    }
   }
 
   function validate(values) {
-    let errors = {
-      //   description: "Enter a valid description",
-      //   targetDate : "Enter a valid target date"
-    };
-    if (values.description.length < 5) {
+    let errors = {};
+
+    if (!values.description || values.description.length < 5) {
       errors.description = "Enter a valid description";
     }
 
-    if (values.targetDate == null) {
+    if (
+      !values.targetDate ||
+      !moment(values.targetDate).isValid()
+    ) {
       errors.targetDate = "Enter a valid target date";
     }
-    console.log(values);
+
     return errors;
   }
 
   return (
     <div className="container">
       <h2>Enter Todo Details</h2>
+
       <div className="m-5">
         <Formik
           initialValues={{ description, targetDate }}
@@ -74,39 +87,41 @@ export default function TodoComponent() {
           validateOnChange={false}
           validateOnBlur={false}
         >
-          {(props) => (
-            <Form>
-              <ErrorMessage
+          <Form>
+            <ErrorMessage
+              name="description"
+              component="div"
+              className="alert alert-warning"
+            />
+
+            <ErrorMessage
+              name="targetDate"
+              component="div"
+              className="alert alert-warning"
+            />
+
+            <fieldset className="form-group">
+              <label>Description</label>
+              <Field
+                type="text"
+                className="form-control"
                 name="description"
-                component="div"
-                className="alert alert-warning small"
               />
+            </fieldset>
 
-              <ErrorMessage
+            <fieldset className="form-group">
+              <label>Target Date</label>
+              <Field
+                type="date"
+                className="form-control"
                 name="targetDate"
-                component="div"
-                className="alert alert-warning small"
               />
+            </fieldset>
 
-              <fieldset className="form-group">
-                <label>Description</label>
-                <Field
-                  type="text"
-                  className="form-control"
-                  name="description"
-                />
-              </fieldset>
-
-              <fieldset className="form-group">
-                <label>Target Date</label>
-                <Field type="date" className="form-control" name="targetDate" />
-              </fieldset>
-
-              <div>
-                <button className="btn btn-success m-5">Submit</button>
-              </div>
-            </Form>
-          )}
+            <button className="btn btn-success m-5">
+              Submit
+            </button>
+          </Form>
         </Formik>
       </div>
     </div>

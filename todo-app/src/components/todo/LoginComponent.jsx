@@ -20,9 +20,9 @@ export default function LoginComponent() {
     setPassword(event.target.value);
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
 
-    if (authContext.login(username, password)) {
+    if (await authContext.login(username, password)) {
         navigate(`/welcome/${username}`);
     } else {
         setShowErrorMessage(true);
