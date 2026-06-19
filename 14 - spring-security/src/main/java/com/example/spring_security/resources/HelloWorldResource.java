@@ -1,4 +1,4 @@
-package com.example.spring_security;
+package com.example.spring_security.resources;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
