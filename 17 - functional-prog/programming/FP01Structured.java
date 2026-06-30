@@ -1,5 +1,3 @@
-package programming;
-
 import java.util.List;
 
 public class FP01Structured {

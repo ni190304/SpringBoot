@@ -1,8 +1,8 @@
-package programming;
+
 
 import java.util.List;
 
-public class FP02Functional {
+public class FP01Functional {
 
     public static void main(String[] args) {
 
